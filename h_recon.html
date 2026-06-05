@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Recon Engine Daily Report</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#111;color:#e2e8f0;font-family:'Segoe UI',sans-serif;font-size:13px;padding:16px;}
+h1{font-size:15px;font-weight:700;color:#fff;}
+.subtitle{font-size:11px;color:#888;margin-bottom:14px;}
+.tabs{display:flex;gap:8px;margin-bottom:16px;}
+.tab{padding:7px 18px;border-radius:6px;border:1px solid #333;background:#1a1a1a;color:#aaa;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s;}
+.tab.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.day-label{font-size:11px;color:#aaa;margin-bottom:8px;}
+.day-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.day-btn{width:34px;height:34px;border-radius:6px;border:1px solid #333;background:#1a1a1a;color:#ccc;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.day-btn:hover{border-color:#2563eb;color:#2563eb;}
+.day-btn.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.day-btn.has-data{border-color:#10b981;color:#10b981;}
+.day-btn.has-data.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.entry-section{margin-bottom:16px;}
+.entry-title{font-size:12px;color:#aaa;margin-bottom:10px;font-weight:600;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.field-group label{display:block;font-size:11px;color:#aaa;margin-bottom:4px;}
+.field-group input{width:100%;background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:9px 12px;color:#fff;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s;}
+.field-group input:focus{border-color:#2563eb;}
+.field-group.full{grid-column:1/-1;}
+.btn-save{width:100%;padding:11px;background:#1a1a1a;border:1px solid #444;border-radius:8px;color:#ccc;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;}
+.btn-save:hover{background:#2563eb;border-color:#2563eb;color:#fff;}
+.summary-title{text-align:center;font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;}
+.pie-wrap{display:flex;justify-content:center;margin-bottom:14px;}
+.pie-wrap canvas{max-width:320px;max-height:320px;}
+.legend{display:flex;flex-direction:column;gap:0px;margin-bottom:18px;}
+.legend-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1e1e1e;}
+.legend-row:last-child{border-bottom:none;}
+.legend-left{display:flex;align-items:center;gap:8px;}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.legend-name{font-size:12px;color:#ccc;}
+.legend-val{font-size:13px;color:#fff;font-weight:700;font-family:monospace;}
+.trend-section{margin-bottom:12px;}
+.trend-title{font-size:12px;color:#aaa;font-weight:600;margin-bottom:8px;}
+.trend-section canvas{width:100%!important;max-height:140px;}
+hr{border:none;border-top:1px solid #222;margin:14px 0;}
+</style>
+</head>
+<body>
+
+<h1>Recon engine daily report</h1>
+<div class="subtitle">June 2026 — 26 working days</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('H')">H Recon</div>
+  <div class="tab" onclick="switchTab('P15')">P15 Recon</div>
+</div>
+
+<div class="day-label">Select day</div>
+<div class="day-grid" id="day_grid"></div>
+
+<div class="entry-section">
+  <div class="entry-title" id="entry_title">Enter data for day 1</div>
+  <div class="field-row">
+    <div class="field-group">
+      <label>Core receipt</label>
+      <input type="number" id="inp_core" placeholder="0" min="0"/>
+    </div>
+    <div class="field-group">
+      <label>Invoice received</label>
+      <input type="number" id="inp_inv_r" placeholder="0" min="0"/>
+    </div>
+    <div class="field-group full">
+      <label>Invoice dispatched</label>
+      <input type="number" id="inp_inv_d" placeholder="0" min="0"/>
+    </div>
+  </div>
+  <button class="btn-save" onclick="saveDay()">💾 Save day <span id="save_day_num">1</span></button>
+</div>
+
+<hr/>
+
+<div class="summary-title" id="summary_title">Day 1 summary — H Recon</div>
+
+<div class="pie-wrap">
+  <canvas id="pie_chart"></canvas>
+</div>
+
+<div class="legend" id="legend_box"></div>
+
+<hr/>
+
+<div class="trend-section">
+  <div class="trend-title">Core receipt trend</div>
+  <canvas id="bar_chart" height="120"></canvas>
+</div>
+
+<div class="trend-section">
+  <div class="trend-title">Invoice dispatched trend</div>
+  <canvas id="line_chart" height="120"></canvas>
+</div>
+
+<script>
+const TOTAL_DAYS = 26;
+let activeTab = 'H';
+let selectedDay = 1;
+
+const store = {
+  H:   JSON.parse(localStorage.getItem('recon_H')   || '{}'),
+  P15: JSON.parse(localStorage.getItem('recon_P15') || '{}'),
+};
+
+if (!store.H['1']) store.H['1'] = {core:29, inv_r:0,  inv_d:0};
+if (!store.H['2']) store.H['2'] = {core:5,  inv_r:21, inv_d:21};
+if (!store.H['3']) store.H['3'] = {core:0,  inv_r:20, inv_d:21};
+persist();
+
+function persist() {
+  localStorage.setItem('recon_H',   JSON.stringify(store.H));
+  localStorage.setItem('recon_P15', JSON.stringify(store.P15));
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  selectedDay = 1;
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('active',(i===0&&tab==='H')||(i===1&&tab==='P15'));
+  });
+  renderAll();
+}
+
+function saveDay() {
+  const core  = parseInt(document.getElementById('inp_core').value)  || 0;
+  const inv_r = parseInt(document.getElementById('inp_inv_r').value) || 0;
+  const inv_d = parseInt(document.getElementById('inp_inv_d').value) || 0;
+  store[activeTab][selectedDay] = {core, inv_r, inv_d};
+  persist();
+  renderAll();
+}
+
+function calcUpTo(day) {
+  const s = store[activeTab];
+  let cumCore=0, cumR=0, cumD=0, count=0;
+  for(let i=1;i<=day;i++){
+    if(s[i]){ cumCore+=s[i].core; cumR+=s[i].inv_r; cumD+=s[i].inv_d; count++; }
+  }
+  const avgR    = count ? +(cumR/count).toFixed(1)    : 0;
+  const avgD    = count ? +(cumD/count).toFixed(1)    : 0;
+  const avgCore = count ? +(cumCore/count).toFixed(1) : 0;
+  return {cumCore, cumR, cumD, avgR, avgD, avgCore};
+}
+
+const FIELDS = [
+  { key:'core',     label:'Core receipt',            color:'#2563eb' },
+  { key:'invDisp',  label:'Invoice dispatched',      color:'#10b981' },
+  { key:'coreCum',  label:'Core cumulative',         color:'#ef4444' },
+  { key:'invCum',   label:'Invoice cumulative',      color:'#f97316' },
+  { key:'invAvg',   label:'Invoice & dispatch avg',  color:'#eab308' },
+  { key:'coreAvg',  label:'Core avg receipt',        color:'#a855f7' },
+];
+
+let pieChart=null, barChart=null, lineChart=null;
+
+function renderPie(day) {
+  const s = store[activeTab];
+  const d = s[day] || {core:0, inv_r:0, inv_d:0};
+  const c = calcUpTo(day);
+
+  const values = {
+    core:    d.core,
+    invDisp: d.inv_d,
+    coreCum: c.cumCore,
+    invCum:  c.cumR,
+    invAvg:  c.avgR,
+    coreAvg: c.avgCore,
+  };
+
+  if(pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById('pie_chart'),{
+    type:'pie',
+    data:{
+      labels: FIELDS.map(f=>f.label),
+      datasets:[{
+        data: FIELDS.map(()=>1),
+        backgroundColor: FIELDS.map(f=>f.color),
+        borderColor:'#111',
+        borderWidth:3,
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{
+            label: ctx => {
+              const f = FIELDS[ctx.dataIndex];
+              return ` ${f.label}: ${values[f.key]}`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const box = document.getElementById('legend_box');
+  box.innerHTML = FIELDS.map(f=>`
+    <div class="legend-row">
+      <div class="legend-left">
+        <div class="legend-dot" style="background:${f.color}"></div>
+        <span class="legend-name">${f.label}</span>
+      </div>
+      <span class="legend-val">${values[f.key]}</span>
+    </div>
+  `).join('');
+}
+
+function renderTrends() {
+  const s = store[activeTab];
+  const labels=[], coreVals=[], dispVals=[];
+  for(let i=1;i<=TOTAL_DAYS;i++){
+    labels.push(`D${i<10?'0'+i:i}`);
+    coreVals.push(s[i]?s[i].core:0);
+    dispVals.push(s[i]?s[i].inv_d:0);
+  }
+  const gridColor='rgba(255,255,255,0.05)';
+  const tickColor='#555';
+  const baseScales={
+    x:{ticks:{color:tickColor,font:{size:9}},grid:{color:gridColor}},
+    y:{ticks:{color:tickColor,font:{size:9}},grid:{color:gridColor},beginAtZero:true}
+  };
+
+  if(barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById('bar_chart'),{
+    type:'bar',
+    data:{labels,datasets:[{data:coreVals,backgroundColor:'rgba(37,99,235,0.8)',borderColor:'#2563eb',borderWidth:1,borderRadius:3}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:baseScales}
+  });
+
+  if(lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById('line_chart'),{
+    type:'line',
+    data:{labels,datasets:[{data:dispVals,borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',pointRadius:3,pointBackgroundColor:'#10b981',tension:0.4,fill:true,borderWidth:2}]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:baseScales}
+  });
+}
+
+function renderDayGrid() {
+  const s = store[activeTab];
+  const grid = document.getElementById('day_grid');
+  grid.innerHTML='';
+  for(let i=1;i<=TOTAL_DAYS;i++){
+    const btn=document.createElement('div');
+    btn.className='day-btn'+(s[i]?' has-data':'')+(i===selectedDay?' active':'');
+    btn.textContent=i;
+    btn.onclick=()=>{ selectedDay=i; renderAll(); };
+    grid.appendChild(btn);
+  }
+}
+
+function renderAll() {
+  document.getElementById('entry_title').textContent   = `Enter data for day ${selectedDay}`;
+  document.getElementById('save_day_num').textContent  = selectedDay;
+  document.getElementById('summary_title').textContent = `Day ${selectedDay} summary — ${activeTab} Recon`;
+  const ex = store[activeTab][selectedDay];
+  document.getElementById('inp_core').value  = ex ? ex.core  : '';
+  document.getElementById('inp_inv_r').value = ex ? ex.inv_r : '';
+  document.getElementById('inp_inv_d').value = ex ? ex.inv_d : '';
+  renderDayGrid();
+  renderPie(selectedDay);
+  renderTrends();
+}
+
+renderAll();
+</script>
+</body>
+</html>
