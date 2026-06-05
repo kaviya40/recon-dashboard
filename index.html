@@ -66,10 +66,7 @@ h1{font-size:15px;font-weight:700;color:#fff;}
 .btn-email{padding:11px;background:#1e3a5f;border:1px solid #2563eb;border-radius:8px;color:#2563eb;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.2s;}
 .btn-email:hover{background:#2563eb;color:#fff;}
 hr{border:none;border-top:1px solid #222;margin:14px 0;}
-@media(max-width:500px){
-  .field-row{grid-template-columns:1fr;}
-  .share-btns{grid-template-columns:1fr;}
-}
+@media(max-width:500px){.field-row{grid-template-columns:1fr;}.share-btns{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -91,18 +88,9 @@ hr{border:none;border-top:1px solid #222;margin:14px 0;}
 <div class="entry-section">
   <div class="entry-title" id="entry_title">Enter data</div>
   <div class="field-row">
-    <div class="field-group">
-      <label>Core receipt</label>
-      <input type="number" id="inp_core" placeholder="0" min="0"/>
-    </div>
-    <div class="field-group">
-      <label>Invoice received</label>
-      <input type="number" id="inp_inv_r" placeholder="0" min="0"/>
-    </div>
-    <div class="field-group full">
-      <label>Invoice dispatched</label>
-      <input type="number" id="inp_inv_d" placeholder="0" min="0"/>
-    </div>
+    <div class="field-group"><label>Core receipt</label><input type="number" id="inp_core" placeholder="0" min="0"/></div>
+    <div class="field-group"><label>Invoice received</label><input type="number" id="inp_inv_r" placeholder="0" min="0"/></div>
+    <div class="field-group full"><label>Invoice dispatched</label><input type="number" id="inp_inv_d" placeholder="0" min="0"/></div>
   </div>
   <button class="btn-save" onclick="saveDay()">💾 Save</button>
   <div class="modified-info" id="modified_info"></div>
@@ -114,9 +102,7 @@ hr{border:none;border-top:1px solid #222;margin:14px 0;}
 <hr/>
 <div class="monthly-section">
   <div class="monthly-title">📅 Monthly Summary</div>
-  <div style="overflow-x:auto">
-    <table class="monthly-table" id="monthly_table"></table>
-  </div>
+  <div style="overflow-x:auto"><table class="monthly-table" id="monthly_table"></table></div>
 </div>
 <hr/>
 <div class="trend-section">
@@ -139,15 +125,8 @@ hr{border:none;border-top:1px solid #222;margin:14px 0;}
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-let activeTab='H';
-let today=new Date();
-let viewYear=today.getFullYear();
-let viewMonth=today.getMonth();
-let selectedDate=formatDate(today);
-const store={
-  H:JSON.parse(localStorage.getItem('recon_final_H')||'{}'),
-  P15:JSON.parse(localStorage.getItem('recon_final_P15')||'{}'),
-};
+let activeTab='H',today=new Date(),viewYear=today.getFullYear(),viewMonth=today.getMonth(),selectedDate=formatDate(today);
+const store={H:JSON.parse(localStorage.getItem('recon_final_H')||'{}'),P15:JSON.parse(localStorage.getItem('recon_final_P15')||'{}')};
 const now=new Date();
 function pd(d){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 if(!store.H[pd(1)])store.H[pd(1)]={core:29,inv_r:0,inv_d:0,ts:new Date(now.getFullYear(),now.getMonth(),1).toISOString()};
@@ -164,12 +143,22 @@ function saveDay(){
   const core=parseInt(document.getElementById('inp_core').value)||0;
   const inv_r=parseInt(document.getElementById('inp_inv_r').value)||0;
   const inv_d=parseInt(document.getElementById('inp_inv_d').value)||0;
-  store[activeTab][selectedDate]={core,inv_r,inv_d,ts:new Date().toISOString()};
+  const old=store[activeTab][selectedDate]||{core:null,inv_r:null,inv_d:null};
+  const ts=new Date().toISOString();
+  const changes=[];
+  if(old.core===null){changes.push(`New entry — Core: ${core}, Inv.Rec: ${inv_r}, Inv.Disp: ${inv_d}`);}
+  else{
+    if(old.core!==core)changes.push(`Core Receipt: ${old.core} → ${core}`);
+    if(old.inv_r!==inv_r)changes.push(`Invoice Received: ${old.inv_r} → ${inv_r}`);
+    if(old.inv_d!==inv_d)changes.push(`Invoice Dispatched: ${old.inv_d} → ${inv_d}`);
+  }
+  const log=old.log||[];
+  if(changes.length>0)log.push({ts,changes});
+  store[activeTab][selectedDate]={core,inv_r,inv_d,ts,log};
   persist();renderAll();
 }
 function calcUpToDate(date){
-  const s=store[activeTab];
-  const keys=Object.keys(s).filter(k=>k<=date).sort();
+  const s=store[activeTab];const keys=Object.keys(s).filter(k=>k<=date).sort();
   let cumCore=0,cumR=0,cumD=0;
   keys.forEach(k=>{cumCore+=s[k].core;cumR+=s[k].inv_r;cumD+=s[k].inv_d;});
   const n=keys.length||1;
@@ -177,11 +166,7 @@ function calcUpToDate(date){
 }
 function getMonthlyData(){
   const s=store[activeTab];const monthly={};
-  Object.keys(s).sort().forEach(k=>{
-    const ym=k.substring(0,7);
-    if(!monthly[ym])monthly[ym]={core:0,inv_r:0,inv_d:0,days:0};
-    monthly[ym].core+=s[k].core;monthly[ym].inv_r+=s[k].inv_r;monthly[ym].inv_d+=s[k].inv_d;monthly[ym].days++;
-  });
+  Object.keys(s).sort().forEach(k=>{const ym=k.substring(0,7);if(!monthly[ym])monthly[ym]={core:0,inv_r:0,inv_d:0,days:0};monthly[ym].core+=s[k].core;monthly[ym].inv_r+=s[k].inv_r;monthly[ym].inv_d+=s[k].inv_d;monthly[ym].days++;});
   return monthly;
 }
 function renderCalendar(){
@@ -224,14 +209,28 @@ function renderPie(){
   document.getElementById('inp_core').value=ex?ex.core:'';
   document.getElementById('inp_inv_r').value=ex?ex.inv_r:'';
   document.getElementById('inp_inv_d').value=ex?ex.inv_d:'';
-  if(ex&&ex.ts){const dt=new Date(ex.ts);document.getElementById('modified_info').innerHTML=`Last modified: <span>${dt.toLocaleDateString()} ${dt.toLocaleTimeString()}</span>`;}
-  else document.getElementById('modified_info').innerHTML='';
+  if(ex&&ex.ts){
+    const dt=new Date(ex.ts);
+    let html=`<div style="margin-bottom:4px">Last modified: <span>${dt.toLocaleDateString()} ${dt.toLocaleTimeString()}</span></div>`;
+    if(ex.log&&ex.log.length>0){
+      html+=`<div style="background:#0d1117;border:1px solid #222;border-radius:6px;padding:8px;margin-top:6px;text-align:left;max-height:140px;overflow-y:auto">`;
+      html+=`<div style="color:#555;font-size:10px;margin-bottom:6px;font-family:monospace">CHANGE LOG</div>`;
+      [...ex.log].reverse().forEach(l=>{
+        const ld=new Date(l.ts);
+        html+=`<div style="margin-bottom:8px;border-bottom:1px solid #1a1a1a;padding-bottom:6px">`;
+        html+=`<div style="color:#f59e0b;font-size:9px;font-family:monospace;margin-bottom:2px">${ld.toLocaleDateString()} ${ld.toLocaleTimeString()}</div>`;
+        l.changes.forEach(ch=>{html+=`<div style="color:#ccc;font-size:10px;font-family:monospace">• ${ch}</div>`;});
+        html+=`</div>`;
+      });
+      html+=`</div>`;
+    }
+    document.getElementById('modified_info').innerHTML=html;
+  } else document.getElementById('modified_info').innerHTML='';
   if(pieChart)pieChart.destroy();
   const insideLabelPlugin={
     id:'insideLabel',
     afterDatasetDraw(chart){
-      const{ctx}=chart;
-      const dataset=chart.getDatasetMeta(0);
+      const{ctx}=chart;const dataset=chart.getDatasetMeta(0);
       const tot=FIELDS.reduce((s,f)=>s+Math.max(values[f.key],0.001),0)||1;
       dataset.data.forEach((arc,i)=>{
         const f=FIELDS[i];const v=values[f.key];
@@ -240,8 +239,7 @@ function renderPie(){
         const x=arc.x+Math.cos(angle)*(arc.outerRadius*0.65);
         const y=arc.y+Math.sin(angle)*(arc.outerRadius*0.65);
         ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';
-        const words=f.label.split(' ');
-        const shortName=words.length>2?words[0]+' '+words[1]:f.label;
+        const words=f.label.split(' ');const shortName=words.length>2?words[0]+' '+words[1]:f.label;
         ctx.fillStyle='#fff';ctx.font='bold 9px Segoe UI';ctx.fillText(shortName,x,y-6);
         ctx.font='bold 11px Segoe UI';ctx.fillText(pct+'%',x,y+6);
         ctx.restore();
@@ -251,7 +249,7 @@ function renderPie(){
   pieChart=new Chart(document.getElementById('pie_chart'),{
     type:'pie',
     data:{labels:FIELDS.map(f=>f.label),datasets:[{data:FIELDS.map(f=>Math.max(values[f.key],0.001)),backgroundColor:FIELDS.map(f=>f.color),borderColor:'#111',borderWidth:3}]},
-    options:{responsive:true,animation:{animateRotate:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const f=FIELDS[ctx.dataIndex];const v=values[f.key];const pct=((v/total)*100).toFixed(1);return ` ${f.label}: ${v} (${pct}%)`; }}}}},
+    options:{responsive:true,animation:{animateRotate:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>{const f=FIELDS[ctx.dataIndex];const v=values[f.key];const pct=((v/total)*100).toFixed(1);return ` ${f.label}: ${v} (${pct}%)`;}}}}},
     plugins:[insideLabelPlugin]
   });
   document.getElementById('legend_box').innerHTML=FIELDS.map(f=>{
