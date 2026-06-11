@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Recon Engine Daily Report · Shared Data View</title>
+<title>Recon Engine Daily Report</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-size:12px;padding:12px;font-weight:700;}
+body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-size:12px;padding:12px;}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;background:#fff;border-radius:10px;padding:10px 16px;border:1px solid #e2e8f0;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
 .header-left h1{font-size:15px;font-weight:700;color:#1a1a2e;}
 .header-left .subtitle{font-size:10px;color:#94a3b8;margin-top:1px;}
@@ -16,7 +16,7 @@ body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-siz
 .tab-btn{padding:5px 18px;border-radius:6px;border:1.5px solid #cbd5e1;background:#f8fafc;color:#64748b;cursor:pointer;font-size:11px;font-weight:600;transition:all 0.15s;}
 .tab-btn.h-active{background:#1e3a5f;border-color:#2563eb;color:#fff;}
 .tab-btn.p-active{background:#064e3b;border-color:#10b981;color:#fff;}
-.top-row{display:grid;grid-template-columns:300px 1fr 1fr;gap:10px;margin-bottom:10px;}
+.top-row{display:grid;grid-template-columns:320px 1fr 1fr;gap:10px;margin-bottom:10px;}
 .cal-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
 .cal-month{font-size:13px;font-weight:700;color:#1a1a2e;}
@@ -36,12 +36,11 @@ body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-siz
 .selected-date-label{font-size:12px;font-weight:700;color:#1a1a2e;margin-bottom:8px;}
 .field-group{margin-bottom:7px;}
 .field-group label{display:block;font-size:9px;color:#94a3b8;margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;}
-.field-group input{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:6px;padding:7px 10px;color:#1a1a2e;font-size:13px;font-weight:800;outline:none;transition:border-color 0.15s;}
+.field-group input{width:100%;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:6px;padding:7px 10px;color:#1a1a2e;font-size:13px;font-weight:700;outline:none;transition:border-color 0.15s;}
 .field-group input:focus{border-color:#2563eb;background:#fff;}
 .btn-save{width:100%;padding:8px;background:#2563eb;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;margin-top:4px;}
 .btn-save:hover{background:#1d4ed8;}
-.btn-save:disabled{background:#94a3b8;cursor:not-allowed;}
-.changelog{background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:6px;max-height:70px;overflow-y:auto;margin-top:6px;}
+.changelog{background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;padding:6px;max-height:65px;overflow-y:auto;margin-top:6px;}
 .cl-title{color:#f59e0b;font-size:8px;font-weight:700;margin-bottom:3px;}
 .cl-time{color:#3b82f6;font-size:8px;}
 .cl-change{font-size:9px;color:#374151;}
@@ -76,7 +75,7 @@ body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-siz
 .monthly-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
 .monthly-title{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
 .monthly-table{width:100%;border-collapse:collapse;font-size:10px;}
-.monthly-table th{text-align:left;padding:4px 8px;font-size:9px;color:#94a3b8;border-bottom:1.5px solid #e2e8f0;font-weight:800;}
+.monthly-table th{text-align:left;padding:4px 8px;font-size:9px;color:#94a3b8;border-bottom:1.5px solid #e2e8f0;font-weight:600;}
 .monthly-table td{padding:4px 8px;border-bottom:1px solid #f1f5f9;font-family:'Courier New',monospace;}
 .monthly-table tr:last-child td{border-bottom:none;}
 .monthly-table tr:hover td{background:#f8fafc;}
@@ -102,32 +101,19 @@ body{background:#f0f2f5;color:#1a1a2e;font-family:'Segoe UI',sans-serif;font-siz
 .modal-close{background:#f1f5f9;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px;color:#64748b;}
 .modal-close:hover{background:#e2e8f0;}
 .modal-table{width:100%;border-collapse:collapse;font-size:11px;}
-.modal-table th{text-align:left;padding:6px 8px;font-size:9px;color:#94a3b8;border-bottom:1.5px solid #e2e8f0;font-weight:800;background:#f8fafc;}
+.modal-table th{text-align:left;padding:6px 8px;font-size:9px;color:#94a3b8;border-bottom:1.5px solid #e2e8f0;font-weight:600;background:#f8fafc;}
 .modal-table td{padding:5px 8px;border-bottom:1px solid #f1f5f9;font-family:'Courier New',monospace;}
 .modal-table tr:last-child td{border-bottom:none;}
 .modal-table tr:hover td{background:#f8fafc;}
 .modal-section{font-size:10px;font-weight:700;color:#2563eb;background:#eff6ff;padding:5px 8px;border-radius:5px;margin:10px 0 5px;}
 canvas{max-height:90px;}
-.sync-badge{background:#10b98120;color:#059669;font-size:8px;border-radius:20px;padding:2px 8px;margin-left:8px;font-weight:400;}
-.sync-status{font-size:9px;border-radius:20px;padding:2px 8px;margin-left:5px;font-weight:600;}
-.sync-status.loading{background:#fef3c7;color:#d97706;}
-.sync-status.ok{background:#d1fae5;color:#059669;}
-.sync-status.error{background:#fee2e2;color:#dc2626;}
-.toast{position:fixed;bottom:20px;right:20px;background:#1e3a5f;color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;}
-.toast.show{opacity:1;}
-.refresh-btn{background:#f1f5f9;border:1px solid #e2e8f0;color:#64748b;border-radius:5px;padding:2px 8px;cursor:pointer;font-size:10px;margin-left:6px;}
-.refresh-btn:hover{background:#e2e8f0;}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-left">
-    <h1>Recon Engine Daily Report
-      <span class="sync-badge">🔗 SHARED STORAGE</span>
-      <span id="syncStatus" class="sync-status loading">loading...</span>
-      <button class="refresh-btn" onclick="refreshFromStorage()">↻ Refresh</button>
-    </h1>
+    <h1>Recon Engine Daily Report</h1>
     <div class="subtitle" id="report_subtitle"></div>
   </div>
   <div class="tab-btns">
@@ -141,46 +127,33 @@ canvas{max-height:90px;}
     <div class="cal-header">
       <div class="cal-month" id="cal_title"></div>
       <div class="cal-nav">
-        <button class="cal-btn" onclick="changeMonth(-1)">&#8249;</button>
-        <button class="cal-btn" onclick="goToday()">&#8226;</button>
-        <button class="cal-btn" onclick="changeMonth(1)">&#8250;</button>
+        <button class="cal-btn" onclick="changeMonth(-1)">‹</button>
+        <button class="cal-btn" onclick="goToday()">•</button>
+        <button class="cal-btn" onclick="changeMonth(1)">›</button>
       </div>
     </div>
     <div class="cal-grid" id="cal_grid"></div>
   </div>
-
   <div class="entry-card">
-    <div class="card-title">&#128204; Add / Update Record (Shared)</div>
-    <div class="selected-date-label" id="entry_title">&#8212;</div>
-    <div class="field-group">
-      <label>Core Receipt</label>
-      <input type="number" id="inp_core" placeholder="0" min="0"/>
-    </div>
-    <div class="field-group">
-      <label>Invoice Received</label>
-      <input type="number" id="inp_inv_r" placeholder="0" min="0"/>
-    </div>
-    <div class="field-group">
-      <label>Invoice Dispatched</label>
-      <input type="number" id="inp_inv_d" placeholder="0" min="0"/>
-    </div>
-    <button class="btn-save" id="save_btn" onclick="saveDay()">&#128190; Save (Global Shared)</button>
+    <div class="card-title">Select a Date</div>
+    <div class="selected-date-label" id="entry_title">—</div>
+    <div class="field-group"><label>Core Receipt</label><input type="number" id="inp_core" placeholder="0" min="0"/></div>
+    <div class="field-group"><label>Invoice Received</label><input type="number" id="inp_inv_r" placeholder="0" min="0"/></div>
+    <div class="field-group"><label>Invoice Dispatched</label><input type="number" id="inp_inv_d" placeholder="0" min="0"/></div>
+    <button class="btn-save" onclick="saveDay()">💾 Save</button>
     <div id="modified_info"></div>
   </div>
-
   <div class="summary-card">
     <div class="summary-title-row">
       <div class="summary-title">Day Summary</div>
-      <span class="badge" id="summary_date_badge">&#8212;</span>
+      <span class="badge" id="summary_date_badge">—</span>
     </div>
-    <div id="day_summary_box">
-      <div style="color:#94a3b8;font-size:10px;text-align:center;padding:20px;">Click a date to view</div>
-    </div>
+    <div id="day_summary_box"><div style="color:#94a3b8;font-size:10px;text-align:center;padding:20px;">Click a date to view</div></div>
   </div>
 </div>
 
 <div class="summary-bar">
-  <div class="summary-bar-title">&#128202; Summary &#8212; <span id="legend_day_label">&#8212;</span></div>
+  <div class="summary-bar-title">📊 Summary — <span id="legend_day_label">—</span></div>
   <div class="legend-flex" id="legend_box"></div>
 </div>
 
@@ -201,7 +174,7 @@ canvas{max-height:90px;}
 
 <div class="bottom-charts-row">
   <div class="bottom-chart-card">
-    <div class="bottom-chart-title">&#128200; Inv &amp; Dispatch Cumulative</div>
+    <div class="bottom-chart-title">📈 Inv &amp; Dispatch Cumulative</div>
     <div class="dual-chart-labels">
       <span class="dual-label h">H Recon</span>
       <span class="dual-label p">P15 Recon</span>
@@ -212,7 +185,7 @@ canvas{max-height:90px;}
     </div>
   </div>
   <div class="bottom-chart-card">
-    <div class="bottom-chart-title">&#128202; Inv &amp; Dispatch Average</div>
+    <div class="bottom-chart-title">📊 Inv &amp; Dispatch Average</div>
     <div class="dual-chart-labels">
       <span class="dual-label h">H Recon</span>
       <span class="dual-label p">P15 Recon</span>
@@ -223,7 +196,7 @@ canvas{max-height:90px;}
     </div>
   </div>
   <div class="bottom-chart-card">
-    <div class="bottom-chart-title">&#128156; Core Average Receipt</div>
+    <div class="bottom-chart-title">💜 Core Average Receipt</div>
     <div class="dual-chart-labels">
       <span class="dual-label h">H Recon</span>
       <span class="dual-label p">P15 Recon</span>
@@ -236,504 +209,286 @@ canvas{max-height:90px;}
 </div>
 
 <div class="monthly-card">
-  <div class="monthly-title">&#128197; Monthly Summary</div>
-  <div style="overflow-x:auto">
-    <table class="monthly-table" id="monthly_table"></table>
-  </div>
+  <div class="monthly-title">📅 Monthly Summary</div>
+  <div style="overflow-x:auto"><table class="monthly-table" id="monthly_table"></table></div>
 </div>
 
 <div class="actions-row">
-  <button class="btn-action btn-view" onclick="openAllData()">&#128196; View All Data</button>
-  <button class="btn-action btn-excel" onclick="exportExcel()">&#8659; Download Excel (.xlsx)</button>
+  <button class="btn-action btn-view" onclick="openAllData()">📄 View All Data</button>
+  <button class="btn-action btn-excel" onclick="exportExcelInfo()">⬇ Download Excel (.xlsx)</button>
 </div>
 
 <div class="share-card">
-  <div class="share-title">&#128228; Share Day Report</div>
+  <div class="share-title">📤 Share Day Report</div>
   <div class="share-preview" id="share_preview"></div>
   <div class="share-btns">
-    <div class="btn-wa" onclick="shareWA()">&#128241; WhatsApp</div>
-    <div class="btn-email" onclick="shareEmail()">&#128231; Email</div>
+    <div class="btn-wa" onclick="shareWA()">📱 WhatsApp</div>
+    <div class="btn-email" onclick="shareEmail()">📧 Email</div>
   </div>
 </div>
 
 <div class="modal-overlay" id="modal_overlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">&#128196; All Shared Data</div>
-      <button class="modal-close" onclick="closeModal()">&#10005; Close</button>
+      <div class="modal-title">📄 All Data</div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
     </div>
     <div id="modal_body"></div>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// ============================================================
-// STORAGE LAYER
-// Uses localStorage (works in browser, data persists locally)
-// For true cross-user sync: host this HTML on a server and
-// replace persist/load with a backend API call.
-// ============================================================
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let activeTab='H',today=new Date(),viewYear=today.getFullYear(),viewMonth=today.getMonth(),selectedDate='';
+const store={
+  H:JSON.parse(localStorage.getItem('recon_v2_H')||'{}'),
+  P15:JSON.parse(localStorage.getItem('recon_v2_P15')||'{}')
+};
+const now=new Date();
+function pd(d){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+if(!store.H[pd(1)])store.H[pd(1)]={core:29,inv_r:0,inv_d:0,ts:new Date(now.getFullYear(),now.getMonth(),1).toISOString(),log:[]};
+if(!store.H[pd(2)])store.H[pd(2)]={core:5,inv_r:21,inv_d:21,ts:new Date(now.getFullYear(),now.getMonth(),2).toISOString(),log:[]};
+if(!store.H[pd(3)])store.H[pd(3)]={core:0,inv_r:20,inv_d:21,ts:new Date(now.getFullYear(),now.getMonth(),3).toISOString(),log:[]};
+persist();
 
-let store = { H: {}, P15: {} };
-let activeTab = 'H';
-let today = new Date();
-let viewYear = today.getFullYear();
-let viewMonth = today.getMonth();
-let selectedDate = formatDate(today);
+function formatDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function displayDate(s){if(!s)return '—';const p=s.split('-');return `${p[2]}/${p[1]}/${p[0]}`;}
+function persist(){localStorage.setItem('recon_v2_H',JSON.stringify(store.H));localStorage.setItem('recon_v2_P15',JSON.stringify(store.P15));}
 
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-// ---- STATUS & TOAST ----
-function setStatus(msg, type) {
-  var el = document.getElementById('syncStatus');
-  el.textContent = msg;
-  el.className = 'sync-status ' + type;
-}
-
-function showToast(msg, color) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = color || '#1e3a5f';
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2500);
-}
-
-// ---- STORAGE: localStorage (reliable, works offline) ----
-function persist() {
-  try {
-    localStorage.setItem('recon_H_v3', JSON.stringify(store.H));
-    localStorage.setItem('recon_P15_v3', JSON.stringify(store.P15));
-    setStatus('saved \u2713', 'ok');
-    return true;
-  } catch(e) {
-    setStatus('save error', 'error');
-    return false;
-  }
-}
-
-function loadFromStorage() {
-  setStatus('loading...', 'loading');
-  try {
-    var h = localStorage.getItem('recon_H_v3');
-    var p = localStorage.getItem('recon_P15_v3');
-    if (h) store.H = JSON.parse(h);
-    if (p) store.P15 = JSON.parse(p);
-    setStatus('ready \u2713', 'ok');
-    return true;
-  } catch(e) {
-    setStatus('load error', 'error');
-    return false;
-  }
-}
-
-function refreshFromStorage() {
-  loadFromStorage();
+function switchTab(t){
+  activeTab=t;selectedDate='';
+  document.getElementById('tab_H').className='tab-btn'+(t==='H'?' h-active':'');
+  document.getElementById('tab_P15').className='tab-btn'+(t==='P15'?' p-active':'');
   renderAll();
-  showToast('\u2713 Refreshed from storage', '#059669');
+}
+function changeMonth(d){viewMonth+=d;if(viewMonth>11){viewMonth=0;viewYear++;}if(viewMonth<0){viewMonth=11;viewYear--;}renderAll();}
+function goToday(){viewYear=today.getFullYear();viewMonth=today.getMonth();renderAll();}
+
+function saveDay(){
+  if(!selectedDate)return;
+  const core=parseInt(document.getElementById('inp_core').value)||0;
+  const inv_r=parseInt(document.getElementById('inp_inv_r').value)||0;
+  const inv_d=parseInt(document.getElementById('inp_inv_d').value)||0;
+  const old=store[activeTab][selectedDate]||{core:null,inv_r:null,inv_d:null};
+  const ts=new Date().toISOString();
+  const changes=[];
+  if(old.core===null)changes.push(`New: Core=${core}, Rec=${inv_r}, Disp=${inv_d}`);
+  else{if(old.core!==core)changes.push(`Core: ${old.core}→${core}`);if(old.inv_r!==inv_r)changes.push(`Rec: ${old.inv_r}→${inv_r}`);if(old.inv_d!==inv_d)changes.push(`Disp: ${old.inv_d}→${inv_d}`);}
+  const log=old.log||[];
+  if(changes.length>0)log.push({ts,changes});
+  store[activeTab][selectedDate]={core,inv_r,inv_d,ts,log};
+  persist();selectedDate='';renderAll();
 }
 
-// ---- CORE HELPERS ----
-function formatDate(d) {
-  return d.getFullYear() + '-' +
-    String(d.getMonth()+1).padStart(2,'0') + '-' +
-    String(d.getDate()).padStart(2,'0');
+function calcUpTo(tab,date){
+  if(!date)return{cumCore:0,cumR:0,cumD:0,avgR:0,avgD:0,avgCore:0};
+  const s=store[tab];const keys=Object.keys(s).filter(k=>k<=date).sort();
+  let cc=0,cr=0,cd=0;keys.forEach(k=>{cc+=s[k].core;cr+=s[k].inv_r;cd+=s[k].inv_d;});
+  const n=keys.length||1;
+  return{cumCore:cc,cumR:cr,cumD:cd,avgR:+(cr/n).toFixed(1),avgD:+(cd/n).toFixed(1),avgCore:+(cc/n).toFixed(1)};
 }
 
-function displayDate(s) {
-  if (!s) return '\u2014';
-  var p = s.split('-');
-  return p[2] + '/' + p[1] + '/' + p[0];
-}
-
-function calcUpTo(tab, date) {
-  if (!date) return { cumCore:0, cumR:0, cumD:0, avgR:0, avgD:0, avgCore:0 };
-  var s = store[tab];
-  var keys = Object.keys(s).filter(function(k){ return k <= date; }).sort();
-  var cc=0, cr=0, cd=0;
-  keys.forEach(function(k){ cc+=s[k].core; cr+=s[k].inv_r; cd+=s[k].inv_d; });
-  var n = keys.length || 1;
-  return {
-    cumCore: cc, cumR: cr, cumD: cd,
-    avgR: +(cr/n).toFixed(1),
-    avgD: +(cd/n).toFixed(1),
-    avgCore: +(cc/n).toFixed(1)
-  };
-}
-
-function buildSeries(tab) {
-  var s = store[tab];
-  var keys = Object.keys(s).sort();
-  var labels=[], core=[], invR=[], invDisp=[], invCum=[], invAvg=[], coreAvg=[];
-  var cc=0, cr=0, cd=0;
-  keys.forEach(function(k, i) {
-    var p = k.split('-');
-    labels.push(p[2]+'/'+p[1]);
-    cc+=s[k].core; cr+=s[k].inv_r; cd+=s[k].inv_d;
-    var n=i+1;
-    core.push(s[k].core);
-    invR.push(s[k].inv_r);
-    invDisp.push(s[k].inv_d);
-    invCum.push(cr+cd);
-    invAvg.push(+((cr+cd)/(2*n)).toFixed(1));
-    coreAvg.push(+(cc/n).toFixed(1));
+function buildSeries(tab){
+  const s=store[tab];const keys=Object.keys(s).sort();
+  const labels=[],core=[],invR=[],invDisp=[],invCum=[],invAvg=[],coreAvg=[];
+  let cc=0,cr=0,cd=0;
+  keys.forEach((k,i)=>{
+    const p=k.split('-');labels.push(`${p[2]}/${p[1]}`);
+    cc+=s[k].core;cr+=s[k].inv_r;cd+=s[k].inv_d;const n=i+1;
+    core.push(s[k].core);invR.push(s[k].inv_r);invDisp.push(s[k].inv_d);
+    invCum.push(cr+cd);invAvg.push(+((cr+cd)/(2*n)).toFixed(1));coreAvg.push(+(cc/n).toFixed(1));
   });
-  return { labels:labels, core:core, invR:invR, invDisp:invDisp, invCum:invCum, invAvg:invAvg, coreAvg:coreAvg };
+  return{labels,core,invR,invDisp,invCum,invAvg,coreAvg};
 }
 
-// ---- TAB & NAVIGATION ----
-function switchTab(t) {
-  activeTab = t;
-  selectedDate = formatDate(today);
-  document.getElementById('tab_H').className = 'tab-btn' + (t==='H' ? ' h-active' : '');
-  document.getElementById('tab_P15').className = 'tab-btn' + (t==='P15' ? ' p-active' : '');
-  renderAll();
-}
+const FIELDS=[
+  {key:'core',label:'Core receipt',color:'#2563eb'},
+  {key:'invDisp',label:'Inv dispatched',color:'#10b981'},
+  {key:'coreCum',label:'Core cumulative',color:'#ef4444'},
+  {key:'invCum',label:'Inv cumulative',color:'#f97316'},
+  {key:'invAvg',label:'Inv & disp avg',color:'#eab308'},
+  {key:'coreAvg',label:'Core avg',color:'#a855f7'},
+];
 
-function changeMonth(d) {
-  viewMonth += d;
-  if (viewMonth > 11) { viewMonth=0; viewYear++; }
-  if (viewMonth < 0)  { viewMonth=11; viewYear--; }
-  renderAll();
-}
-
-function goToday() {
-  viewYear = today.getFullYear();
-  viewMonth = today.getMonth();
-  renderAll();
-}
-
-// ---- SAVE ----
-function saveDay() {
-  if (!selectedDate) { showToast('\u26a0 Select a date first!', '#f59e0b'); return; }
-  var btn = document.getElementById('save_btn');
-  btn.disabled = true;
-  btn.textContent = '\u23f3 Saving...';
-
-  var core  = parseInt(document.getElementById('inp_core').value)  || 0;
-  var inv_r = parseInt(document.getElementById('inp_inv_r').value) || 0;
-  var inv_d = parseInt(document.getElementById('inp_inv_d').value) || 0;
-
-  var old = store[activeTab][selectedDate] || { core:null, inv_r:null, inv_d:null, log:[] };
-  var ts = new Date().toISOString();
-  var changes = [];
-
-  if (old.core === null) {
-    changes.push('New entry: Core='+core+', Rec='+inv_r+', Disp='+inv_d);
-  } else {
-    if (old.core  !== core)  changes.push('Core: '+old.core+' \u2192 '+core);
-    if (old.inv_r !== inv_r) changes.push('Received: '+old.inv_r+' \u2192 '+inv_r);
-    if (old.inv_d !== inv_d) changes.push('Dispatched: '+old.inv_d+' \u2192 '+inv_d);
-  }
-
-  if (changes.length === 0) {
-    showToast('\u2139 No changes detected', '#64748b');
-    btn.disabled = false;
-    btn.textContent = '\ud83d\udcbe Save (Global Shared)';
-    return;
-  }
-
-  var log = old.log ? old.log.slice() : [];
-  log.unshift({ ts:ts, changes:changes });
-
-  store[activeTab][selectedDate] = { core:core, inv_r:inv_r, inv_d:inv_d, ts:ts, log:log };
-
-  var ok = persist();
-  if (ok) {
-    showToast('\u2713 Saved successfully!', '#059669');
-  } else {
-    showToast('\u26a0 Save failed — check storage', '#dc2626');
-  }
-
-  btn.disabled = false;
-  btn.textContent = '\ud83d\udcbe Save (Global Shared)';
-  renderAll();
-}
-
-// ---- RENDER: CALENDAR ----
-function renderCalendar() {
-  var s = store[activeTab];
-  document.getElementById('cal_title').textContent = MONTHS[viewMonth] + ' ' + viewYear;
-  document.getElementById('report_subtitle').textContent = MONTHS[viewMonth] + ' ' + viewYear + ' \u2014 Recon Daily Report';
-  var grid = document.getElementById('cal_grid');
-  grid.innerHTML = '';
-  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(function(d) {
-    var el = document.createElement('div');
-    el.className = 'cal-day-name'; el.textContent = d; grid.appendChild(el);
-  });
-  var first = new Date(viewYear, viewMonth, 1).getDay();
-  var days  = new Date(viewYear, viewMonth+1, 0).getDate();
-  for (var i=0; i<first; i++) {
-    var el = document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
-  }
-  for (var d=1; d<=days; d++) {
-    var ds = viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    var el = document.createElement('div');
-    el.className = 'cal-day'; el.textContent = d;
-    if (s[ds]) el.classList.add('has-data');
-    if (ds === formatDate(today) && ds !== selectedDate) el.classList.add('today');
-    if (ds === selectedDate) el.classList.add('selected');
-    (function(dateStr){
-      el.onclick = function(){ selectedDate = (selectedDate===dateStr) ? '' : dateStr; renderAll(); };
-    })(ds);
+function renderCalendar(){
+  const s=store[activeTab];
+  document.getElementById('cal_title').textContent=`${MONTHS[viewMonth]} ${viewYear}`;
+  document.getElementById('report_subtitle').textContent=`${MONTHS[viewMonth]} ${viewYear} — Recon Engine`;
+  const grid=document.getElementById('cal_grid');grid.innerHTML='';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{const el=document.createElement('div');el.className='cal-day-name';el.textContent=d;grid.appendChild(el);});
+  const first=new Date(viewYear,viewMonth,1).getDay();
+  const days=new Date(viewYear,viewMonth+1,0).getDate();
+  for(let i=0;i<first;i++){const el=document.createElement('div');el.className='cal-day empty';grid.appendChild(el);}
+  for(let d=1;d<=days;d++){
+    const ds=`${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el=document.createElement('div');el.className='cal-day';el.textContent=d;
+    if(s[ds])el.classList.add('has-data');
+    if(ds===formatDate(today)&&ds!==selectedDate)el.classList.add('today');
+    if(ds===selectedDate)el.classList.add('selected');
+    el.onclick=()=>{selectedDate=(selectedDate===ds)?'':ds;renderAll();};
     grid.appendChild(el);
   }
 }
 
-// ---- RENDER: DAY SUMMARY ----
-function renderDaySummary() {
-  var dateKey = selectedDate || formatDate(today);
-  document.getElementById('summary_date_badge').textContent = displayDate(dateKey);
-  var box = document.getElementById('day_summary_box');
-  var ex = store[activeTab][dateKey];
-  if (!ex) {
-    box.innerHTML = '<div style="color:#94a3b8;font-size:10px;text-align:center;padding:20px;">\ud83d\udcc5 ' + displayDate(dateKey) + '<br>No data yet \u2014 enter above &amp; save</div>';
-    return;
-  }
-  var c = calcUpTo(activeTab, dateKey);
-  var rows = [
-    { label:'Core Receipt',     val:ex.core,              color:'#2563eb' },
-    { label:'Inv Rec / Disp',   val:ex.inv_r+' / '+ex.inv_d, color:'#10b981' },
-    { label:'Core Cumulative',  val:c.cumCore,            color:'#ef4444' },
-    { label:'Inv Cumulative',   val:c.cumR+' / '+c.cumD, color:'#f97316' },
-    { label:'Inv &amp; Disp Avg',   val:c.avgR+' / '+c.avgD, color:'#eab308' },
-    { label:'Core Avg',         val:c.avgCore,            color:'#a855f7' }
+function renderDaySummary(){
+  const dateKey=selectedDate||formatDate(today);
+  document.getElementById('summary_date_badge').textContent=displayDate(dateKey);
+  const box=document.getElementById('day_summary_box');
+  const ex=store[activeTab][dateKey];
+  if(!ex){box.innerHTML=`<div style="color:#94a3b8;font-size:10px;text-align:center;padding:20px;">📅 ${displayDate(dateKey)}<br>No data yet</div>`;return;}
+  const c=calcUpTo(activeTab,dateKey);
+  const rows=[
+    {label:'Core Receipt',val:ex.core,color:'#2563eb'},
+    {label:'Inv Rec / Disp',val:`${ex.inv_r} / ${ex.inv_d}`,color:'#10b981'},
+    {label:'Core Cumulative',val:c.cumCore,color:'#ef4444'},
+    {label:'Inv Cumulative',val:`${c.cumR} / ${c.cumD}`,color:'#f97316'},
+    {label:'Inv & Disp Avg',val:`${c.avgR} / ${c.avgD}`,color:'#eab308'},
+    {label:'Core Avg',val:c.avgCore,color:'#a855f7'},
   ];
-  box.innerHTML = rows.map(function(r){
-    return '<div class="s-row"><div class="s-label"><div class="s-dot" style="background:'+r.color+'"></div>'+r.label+'</div><div class="s-val" style="color:'+r.color+'">'+r.val+'</div></div>';
-  }).join('');
+  let html='';
+  rows.forEach(r=>{html+=`<div class="s-row"><div class="s-label"><div class="s-dot" style="background:${r.color}"></div>${r.label}</div><div class="s-val" style="color:${r.color}">${r.val}</div></div>`;});
+  box.innerHTML=html;
 }
 
-// ---- RENDER: ENTRY FORM ----
-function renderEntryForm() {
-  var ex = selectedDate ? store[activeTab][selectedDate] : null;
-  document.getElementById('entry_title').textContent = selectedDate ? '\ud83d\udcc5 ' + displayDate(selectedDate) : '\u2014';
-  document.getElementById('inp_core').value  = ex ? ex.core  : '';
-  document.getElementById('inp_inv_r').value = ex ? ex.inv_r : '';
-  document.getElementById('inp_inv_d').value = ex ? ex.inv_d : '';
-
-  var mi = document.getElementById('modified_info');
-  if (ex && ex.log && ex.log.length) {
-    var html = '<div class="changelog"><div class="cl-title">\ud83d\udccb CHANGE LOG</div>';
-    ex.log.slice(0,4).forEach(function(l){
-      var ld = new Date(l.ts);
-      html += '<div><div class="cl-time">\ud83d\udd50 ' + ld.toLocaleDateString() + ' ' + ld.toLocaleTimeString() + '</div>';
-      l.changes.forEach(function(ch){ html += '<div class="cl-change">\u2022 ' + ch + '</div>'; });
-      html += '</div>';
+function renderEntryForm(){
+  const ex=selectedDate?store[activeTab][selectedDate]:null;
+  document.getElementById('entry_title').textContent=selectedDate?`📅 ${displayDate(selectedDate)}`:'—';
+  document.getElementById('inp_core').value=ex?ex.core:'';
+  document.getElementById('inp_inv_r').value=ex?ex.inv_r:'';
+  document.getElementById('inp_inv_d').value=ex?ex.inv_d:'';
+  if(ex&&ex.log&&ex.log.length>0){
+    let html=`<div class="changelog"><div class="cl-title">📋 CHANGE LOG</div>`;
+    [...ex.log].reverse().forEach(l=>{
+      const ld=new Date(l.ts);
+      html+=`<div style="margin-bottom:4px"><div class="cl-time">🕐 ${ld.toLocaleDateString('en-GB')} ${ld.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>`;
+      l.changes.forEach(ch=>{html+=`<div class="cl-change" style="color:${ch.startsWith('New')?'#10b981':'#374151'}">• ${ch}</div>`;});
+      html+=`</div>`;
     });
-    html += '</div>';
-    mi.innerHTML = html;
-  } else {
-    mi.innerHTML = '<div class="changelog" style="color:#94a3b8;font-size:9px;">No previous logs</div>';
+    html+=`</div>`;
+    document.getElementById('modified_info').innerHTML=html;
+  }else document.getElementById('modified_info').innerHTML='';
+}
+
+function renderLegend(){
+  const date=selectedDate||formatDate(today);
+  const ex=store[activeTab][date];
+  const d=ex||{core:0,inv_r:0,inv_d:0};
+  const c=calcUpTo(activeTab,date);
+  const values={core:d.core,invDisp:d.inv_d,coreCum:c.cumCore,invCum:c.cumR,invAvg:c.avgR,coreAvg:c.avgCore};
+  document.getElementById('legend_day_label').textContent=displayDate(date);
+  document.getElementById('legend_box').innerHTML=FIELDS.map(f=>`
+    <div class="legend-item">
+      <div class="leg-dot" style="background:${f.color}"></div>
+      <span class="leg-label">${f.label}</span>
+      <span class="leg-val" style="color:${f.color}">${values[f.key]}</span>
+    </div>`).join('');
+}
+
+const charts={};
+const CHART_OPTS={
+  responsive:true,
+  plugins:{legend:{display:false}},
+  scales:{
+    x:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'#f1f5f9'}},
+    y:{ticks:{color:'#94a3b8',font:{size:7}},grid:{color:'#f1f5f9'},beginAtZero:true}
   }
-}
+};
 
-// ---- RENDER: LEGEND ----
-function renderLegend() {
-  var date = selectedDate || formatDate(today);
-  var ex = store[activeTab][date] || { core:0, inv_r:0, inv_d:0 };
-  var c = calcUpTo(activeTab, date);
-  document.getElementById('legend_day_label').textContent = displayDate(date);
-  var fields = [
-    { label:'Core receipt',    color:'#2563eb', val:ex.core   },
-    { label:'Inv dispatched',  color:'#10b981', val:ex.inv_d  },
-    { label:'Core cumulative', color:'#ef4444', val:c.cumCore },
-    { label:'Inv cumulative',  color:'#f97316', val:c.cumR    },
-    { label:'Inv & disp avg',  color:'#eab308', val:c.avgR    },
-    { label:'Core avg',        color:'#a855f7', val:c.avgCore }
-  ];
-  document.getElementById('legend_box').innerHTML = fields.map(function(f){
-    return '<div class="legend-item"><div class="leg-dot" style="background:'+f.color+'"></div><span class="leg-label">'+f.label+'</span><span class="leg-val" style="color:'+f.color+'">'+f.val+'</span></div>';
-  }).join('');
-}
-
-// ---- RENDER: CHARTS ----
-var charts = {};
-function makeChart(id, labels, data, color, type) {
-  type = type || 'line';
-  var canvas = document.getElementById(id);
-  if (!canvas) return;
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(canvas, {
-    type: type,
-    data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        borderColor: color,
-        backgroundColor: color + '33',
-        pointRadius: 2,
-        pointBackgroundColor: color,
-        tension: 0.4,
-        fill: true,
-        borderWidth: 1.5
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { font: { size: 7 } } },
-        y: { beginAtZero: true }
-      }
-    }
+function makeChart(id,labels,data,color,type='line'){
+  if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{
+    type:type,
+    data:{labels,datasets:[{data,borderColor:color,backgroundColor:color+'33',pointRadius:2,pointBackgroundColor:color,tension:0.4,fill:true,borderWidth:1.5,borderRadius:type==='bar'?3:0}]},
+    options:{...CHART_OPTS,maintainAspectRatio:false}
   });
 }
 
-function renderTrends() {
-  var s  = buildSeries(activeTab);
-  var sH = buildSeries('H');
-  var sP = buildSeries('P15');
-  makeChart('bar_chart',       s.labels,  s.core,      '#2563eb');
-  makeChart('line_chart',      s.labels,  s.invDisp,   '#10b981');
-  makeChart('invr_chart',      s.labels,  s.invR,      '#f97316');
-  makeChart('h_cum_chart',     sH.labels, sH.invCum,   '#f97316');
-  makeChart('h_avg_chart',     sH.labels, sH.invAvg,   '#eab308');
-  makeChart('h_coreavg_chart', sH.labels, sH.coreAvg,  '#a855f7');
-  makeChart('p_cum_chart',     sP.labels, sP.invCum,   '#10b981');
-  makeChart('p_avg_chart',     sP.labels, sP.invAvg,   '#eab308');
-  makeChart('p_coreavg_chart', sP.labels, sP.coreAvg,  '#a855f7');
+function renderTrends(){
+  const s=buildSeries(activeTab);
+  const sH=buildSeries('H');
+  const sP=buildSeries('P15');
+  makeChart('bar_chart',s.labels,s.core,'#2563eb','line');
+  makeChart('line_chart',s.labels,s.invDisp,'#10b981');
+  makeChart('invr_chart',s.labels,s.invR,'#f97316');
+  makeChart('h_cum_chart',sH.labels,sH.invCum,'#f97316');
+  makeChart('h_avg_chart',sH.labels,sH.invAvg,'#eab308');
+  makeChart('h_coreavg_chart',sH.labels,sH.coreAvg,'#a855f7');
+  makeChart('p_cum_chart',sP.labels,sP.invCum,'#10b981');
+  makeChart('p_avg_chart',sP.labels,sP.invAvg,'#eab308');
+  makeChart('p_coreavg_chart',sP.labels,sP.coreAvg,'#a855f7');
 }
 
-// ---- RENDER: MONTHLY TABLE ----
-function renderMonthly() {
-  var s = store[activeTab];
-  var monthly = {};
-  Object.keys(s).sort().forEach(function(k){
-    var ym = k.substring(0,7);
-    if (!monthly[ym]) monthly[ym] = { core:0, inv_r:0, inv_d:0, days:0 };
-    monthly[ym].core  += s[k].core;
-    monthly[ym].inv_r += s[k].inv_r;
-    monthly[ym].inv_d += s[k].inv_d;
-    monthly[ym].days++;
+function renderMonthly(){
+  const s=store[activeTab];const monthly={};
+  Object.keys(s).sort().forEach(k=>{const ym=k.substring(0,7);if(!monthly[ym])monthly[ym]={core:0,inv_r:0,inv_d:0,days:0};monthly[ym].core+=s[k].core;monthly[ym].inv_r+=s[k].inv_r;monthly[ym].inv_d+=s[k].inv_d;monthly[ym].days++;});
+  const keys=Object.keys(monthly).sort();
+  if(!keys.length){document.getElementById('monthly_table').innerHTML='<tr><td style="color:#94a3b8;padding:8px">No data yet</td></tr>';return;}
+  let html=`<thead><tr><th>Month</th><th>Days</th><th>Core</th><th>Rec</th><th>Disp</th><th>C.Avg</th><th>I.Avg</th></tr></thead><tbody>`;
+  keys.forEach(ym=>{const m=monthly[ym];const[y,mo]=ym.split('-');html+=`<tr><td style="color:#1a1a2e;font-weight:700">${MONTHS_SHORT[parseInt(mo)-1]} ${y}</td><td style="color:#2563eb">${m.days}</td><td style="color:#10b981">${m.core}</td><td style="color:#f97316">${m.inv_r}</td><td style="color:#eab308">${m.inv_d}</td><td style="color:#a855f7">${(m.core/m.days).toFixed(1)}</td><td style="color:#ef4444">${((m.inv_r+m.inv_d)/2/m.days).toFixed(1)}</td></tr>`;});
+  document.getElementById('monthly_table').innerHTML=html+'</tbody>';
+}
+
+function buildMessage(){
+  const date=selectedDate||formatDate(today);
+  const dStr=displayDate(date);
+  const sH=store['H'][date]||{core:0,inv_r:0,inv_d:0};
+  const cH=calcUpTo('H',date);
+  const sP=store['P15'][date]||{core:0,inv_r:0,inv_d:0};
+  const cP=calcUpTo('P15',date);
+  return `${dStr} Recon Core Receipt, Invoice Received & Dispatched :\n_ _ _ _ _ _ _ _ _ _ _ _\nH - Recon Engine\nCore Receipt : ${String(sH.core).padStart(2,'0')}\nInvoice Received & Dispatched : ${sH.inv_r}/${sH.inv_d}\nCore Receipt Cumulative : ${String(cH.cumCore).padStart(2,'0')}\nInvoice & Dispatch Cumulative : ${cH.cumR}\nInvoice & Dispatch Average : ${cH.avgR}\nCore Average Receipt : ${cH.avgCore}\n_ _ _ _ _ _ _ _ _ _ _ _\nP15 - Recon Engine\nCore Receipt : ${String(sP.core).padStart(2,'0')}\nInvoice Received & Dispatched : ${sP.inv_r}/${sP.inv_d}\nCore Receipt Cumulative : ${String(cP.cumCore).padStart(2,'0')}\nInvoice & Dispatch Cumulative : ${cP.cumR}\nInvoice & Dispatch Average : ${cP.avgR}\nCore Average Receipt : ${cP.avgCore}\n_ _ _ _ _ _ _ _ _ _ _ _\nWarm Regards!!`;
+}
+
+function renderShare(){document.getElementById('share_preview').textContent=buildMessage();}
+function shareWA(){window.open(`https://wa.me/?text=${encodeURIComponent(buildMessage())}`,'_blank');}
+function shareEmail(){window.open(`mailto:?subject=${encodeURIComponent(`Recon Engine Report — ${displayDate(selectedDate||formatDate(today))}`)}&body=${encodeURIComponent(buildMessage())}`,'_blank');}
+
+function openAllData(){
+  let html='';
+  ['H','P15'].forEach(tab=>{
+    const s=store[tab];const keys=Object.keys(s).sort();
+    html+=`<div class="modal-section">${tab} Recon — ${keys.length} records</div>`;
+    if(!keys.length){html+='<p style="color:#94a3b8;font-size:11px;padding:4px 0">No data</p>';return;}
+    html+=`<table class="modal-table"><thead><tr><th>Date</th><th>Core Receipt</th><th>Inv Received</th><th>Inv Dispatched</th><th>Saved At</th></tr></thead><tbody>`;
+    keys.forEach(k=>{const r=s[k];const d=new Date(r.ts);html+=`<tr><td style="font-weight:700;color:#1a1a2e">${displayDate(k)}</td><td style="color:#2563eb">${r.core}</td><td style="color:#f97316">${r.inv_r}</td><td style="color:#10b981">${r.inv_d}</td><td style="color:#94a3b8;font-size:9px">${d.toLocaleDateString('en-GB')} ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</td></tr>`;});
+    html+=`</tbody></table>`;
   });
-  var html = '<thead><tr><th>Month</th><th>Days</th><th>Core</th><th>Rec</th><th>Disp</th><th>C.Avg</th><th>I.Avg</th></tr></thead><tbody>';
-  var keys = Object.keys(monthly).sort();
-  if (keys.length === 0) {
-    html += '<tr><td colspan="7" style="color:#94a3b8;text-align:center;padding:16px;">No data yet \u2014 enter records above</td></tr>';
-  } else {
-    keys.forEach(function(ym){
-      var m = monthly[ym];
-      var parts = ym.split('-');
-      html += '<tr><td style="color:#1a1a2e;font-weight:700">' + MONTHS_SHORT[parseInt(parts[1])-1] + ' ' + parts[0] + '</td>';
-      html += '<td style="color:#2563eb">' + m.days + '</td>';
-      html += '<td style="color:#10b981">' + m.core + '</td>';
-      html += '<td style="color:#f97316">' + m.inv_r + '</td>';
-      html += '<td style="color:#eab308">' + m.inv_d + '</td>';
-      html += '<td style="color:#a855f7">' + (m.core/m.days).toFixed(1) + '</td>';
-      html += '<td style="color:#ef4444">' + ((m.inv_r+m.inv_d)/2/m.days).toFixed(1) + '</td></tr>';
-    });
-  }
-  document.getElementById('monthly_table').innerHTML = html + '</tbody>';
-}
-
-// ---- SHARE ----
-function buildMessage() {
-  var date = selectedDate || formatDate(today);
-  var dStr = displayDate(date);
-  var sH = store['H'][date]   || { core:0, inv_r:0, inv_d:0 };
-  var cH = calcUpTo('H',  date);
-  var sP = store['P15'][date] || { core:0, inv_r:0, inv_d:0 };
-  var cP = calcUpTo('P15', date);
-  return dStr + ' Recon Core Receipt, Invoice Received & Dispatched :\n' +
-    '_ _ _ _ _ _ _ _ _ _ _ _\n' +
-    'H - Recon Engine\n' +
-    'Core Receipt : ' + String(sH.core).padStart(2,'0') + '\n' +
-    'Invoice Received & Dispatched : ' + sH.inv_r + '/' + sH.inv_d + '\n' +
-    'Core Receipt Cumulative : ' + String(cH.cumCore).padStart(2,'0') + '\n' +
-    'Invoice & Dispatch Cumulative : ' + cH.cumR + '\n' +
-    'Invoice & Dispatch Average : ' + cH.avgR + '\n' +
-    'Core Average Receipt : ' + cH.avgCore + '\n' +
-    '_ _ _ _ _ _ _ _ _ _ _ _\n' +
-    'P15 - Recon Engine\n' +
-    'Core Receipt : ' + String(sP.core).padStart(2,'0') + '\n' +
-    'Invoice Received & Dispatched : ' + sP.inv_r + '/' + sP.inv_d + '\n' +
-    'Core Receipt Cumulative : ' + String(cP.cumCore).padStart(2,'0') + '\n' +
-    'Invoice & Dispatch Cumulative : ' + cP.cumR + '\n' +
-    'Invoice & Dispatch Average : ' + cP.avgR + '\n' +
-    'Core Average Receipt : ' + cP.avgCore + '\n' +
-    '_ _ _ _ _ _ _ _ _ _ _ _\n' +
-    'Warm Regards!!';
-}
-
-function renderShare() {
-  document.getElementById('share_preview').textContent = buildMessage();
-}
-
-function shareWA() {
-  window.open('https://wa.me/?text=' + encodeURIComponent(buildMessage()), '_blank');
-}
-
-function shareEmail() {
-  window.open('mailto:?subject=' + encodeURIComponent('Recon Report \u2014 ' + displayDate(selectedDate || formatDate(today))) + '&body=' + encodeURIComponent(buildMessage()), '_blank');
-}
-
-// ---- MODAL: ALL DATA ----
-function openAllData() {
-  var html = '';
-  ['H','P15'].forEach(function(tab){
-    var s = store[tab];
-    var keys = Object.keys(s).sort();
-    html += '<div class="modal-section">' + tab + ' Recon \u2014 ' + keys.length + ' records</div>';
-    html += '<table class="modal-table"><thead><tr><th>Date</th><th>Core</th><th>Inv Rec</th><th>Inv Disp</th><th>Last Saved</th></tr></thead><tbody>';
-    if (keys.length === 0) {
-      html += '<tr><td colspan="5" style="color:#94a3b8;text-align:center;padding:12px;">No data entered yet</td></tr>';
-    } else {
-      keys.forEach(function(k){
-        var r = s[k];
-        var d = new Date(r.ts);
-        html += '<tr>';
-        html += '<td style="font-weight:700;color:#1a1a2e">' + displayDate(k) + '</td>';
-        html += '<td style="color:#2563eb">'  + r.core  + '</td>';
-        html += '<td style="color:#f97316">'  + r.inv_r + '</td>';
-        html += '<td style="color:#10b981">'  + r.inv_d + '</td>';
-        html += '<td style="color:#94a3b8;font-size:9px">' + d.toLocaleString() + '</td>';
-        html += '</tr>';
-      });
-    }
-    html += '</tbody></table>';
-  });
-  document.getElementById('modal_body').innerHTML = html;
+  document.getElementById('modal_body').innerHTML=html;
   document.getElementById('modal_overlay').classList.add('show');
 }
+function closeModal(){document.getElementById('modal_overlay').classList.remove('show');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal_overlay'))closeModal();}
 
-function closeModal() {
-  document.getElementById('modal_overlay').classList.remove('show');
-}
-
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal_overlay')) closeModal();
-}
-
-// ---- EXCEL EXPORT ----
-function exportExcel() {
-  function buildSheetData(tab) {
-    var s = store[tab];
-    var keys = Object.keys(s).sort();
-    var rows = [['Date','Core Receipt','Inv Received','Inv Dispatched','Core Cumulative','Inv Cumulative','Inv & Disp Avg','Core Avg']];
-    var cc=0, cr=0, cd=0;
-    keys.forEach(function(k, i){
-      var r = s[k];
+// EXCEL EXPORT — real working download with 2 sheets
+function exportExcelInfo(){
+  function buildSheetData(tab){
+    const s=store[tab];
+    const keys=Object.keys(s).sort();
+    const rows=[['Date','Core Receipt','Inv Received','Inv Dispatched','Core Cumulative','Inv Cumulative','Inv & Disp Avg','Core Avg Receipt']];
+    let cc=0,cr=0,cd=0;
+    keys.forEach((k,i)=>{
+      const r=s[k];
       cc+=r.core; cr+=r.inv_r; cd+=r.inv_d;
-      var invAvg  = +((cr+cd)/(2*(i+1))).toFixed(1);
-      var coreAvg = +(cc/(i+1)).toFixed(1);
-      rows.push([displayDate(k), r.core, r.inv_r, r.inv_d, cc, cr+cd, invAvg, coreAvg]);
+      const n=i+1;
+      const p=k.split('-');
+      const dateStr=`${p[2]}/${p[1]}/${p[0]}`;
+      const invAvg=+((cr+cd)/(2*n)).toFixed(1);
+      const coreAvg=+(cc/n).toFixed(1);
+      rows.push([dateStr, r.core, r.inv_r, r.inv_d, cc, cr+cd, invAvg, coreAvg]);
     });
     return rows;
   }
-  var wb = XLSX.utils.book_new();
-  var wsH = XLSX.utils.aoa_to_sheet(buildSheetData('H'));
-  var wsP = XLSX.utils.aoa_to_sheet(buildSheetData('P15'));
-  XLSX.utils.book_append_sheet(wb, wsH, 'H Recon');
-  XLSX.utils.book_append_sheet(wb, wsP, 'P15 Recon');
-  XLSX.writeFile(wb, 'Recon_Engine_Report.xlsx');
+  const wb=XLSX.utils.book_new();
+  const wsH=XLSX.utils.aoa_to_sheet(buildSheetData('H'));
+  const wsP=XLSX.utils.aoa_to_sheet(buildSheetData('P15'));
+  const wscols=[{wch:12},{wch:14},{wch:14},{wch:16},{wch:18},{wch:16},{wch:16},{wch:18}];
+  wsH['!cols']=wscols; wsP['!cols']=wscols;
+  XLSX.utils.book_append_sheet(wb,wsH,'H Recon');
+  XLSX.utils.book_append_sheet(wb,wsP,'P15 Recon');
+  XLSX.writeFile(wb,'Recon_Engine_Report.xlsx');
 }
 
-// ---- MASTER RENDER ----
-function renderAll() {
+function renderAll(){
   renderCalendar();
   renderDaySummary();
   renderEntryForm();
@@ -742,10 +497,6 @@ function renderAll() {
   renderMonthly();
   renderShare();
 }
-
-// ---- INIT ----
-store = { H: {}, P15: {} };
-loadFromStorage();
 renderAll();
 </script>
 </body>
