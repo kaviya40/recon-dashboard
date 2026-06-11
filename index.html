@@ -120,7 +120,7 @@ canvas{max-height:90px;}
 </style>
 </head>
 <body>
- 
+
 <div class="header">
   <div class="header-left">
     <h1>Recon Engine Daily Report
@@ -135,7 +135,7 @@ canvas{max-height:90px;}
     <div class="tab-btn" id="tab_P15" onclick="switchTab('P15')">P15 Recon</div>
   </div>
 </div>
- 
+
 <div class="top-row">
   <div class="cal-card">
     <div class="cal-header">
@@ -148,7 +148,7 @@ canvas{max-height:90px;}
     </div>
     <div class="cal-grid" id="cal_grid"></div>
   </div>
- 
+
   <div class="entry-card">
     <div class="card-title">&#128204; Add / Update Record (Shared)</div>
     <div class="selected-date-label" id="entry_title">&#8212;</div>
@@ -167,7 +167,7 @@ canvas{max-height:90px;}
     <button class="btn-save" id="save_btn" onclick="saveDay()">&#128190; Save (Global Shared)</button>
     <div id="modified_info"></div>
   </div>
- 
+
   <div class="summary-card">
     <div class="summary-title-row">
       <div class="summary-title">Day Summary</div>
@@ -178,12 +178,12 @@ canvas{max-height:90px;}
     </div>
   </div>
 </div>
- 
+
 <div class="summary-bar">
   <div class="summary-bar-title">&#128202; Summary &#8212; <span id="legend_day_label">&#8212;</span></div>
   <div class="legend-flex" id="legend_box"></div>
 </div>
- 
+
 <div class="charts-row">
   <div class="chart-card">
     <div class="chart-title">Core Receipt Trend</div>
@@ -198,7 +198,7 @@ canvas{max-height:90px;}
     <canvas id="invr_chart"></canvas>
   </div>
 </div>
- 
+
 <div class="bottom-charts-row">
   <div class="bottom-chart-card">
     <div class="bottom-chart-title">&#128200; Inv &amp; Dispatch Cumulative</div>
@@ -234,19 +234,19 @@ canvas{max-height:90px;}
     </div>
   </div>
 </div>
- 
+
 <div class="monthly-card">
   <div class="monthly-title">&#128197; Monthly Summary</div>
   <div style="overflow-x:auto">
     <table class="monthly-table" id="monthly_table"></table>
   </div>
 </div>
- 
+
 <div class="actions-row">
   <button class="btn-action btn-view" onclick="openAllData()">&#128196; View All Data</button>
   <button class="btn-action btn-excel" onclick="exportExcel()">&#8659; Download Excel (.xlsx)</button>
 </div>
- 
+
 <div class="share-card">
   <div class="share-title">&#128228; Share Day Report</div>
   <div class="share-preview" id="share_preview"></div>
@@ -255,7 +255,7 @@ canvas{max-height:90px;}
     <div class="btn-email" onclick="shareEmail()">&#128231; Email</div>
   </div>
 </div>
- 
+
 <div class="modal-overlay" id="modal_overlay" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-header">
@@ -265,9 +265,9 @@ canvas{max-height:90px;}
     <div id="modal_body"></div>
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <script>
 // ============================================================
 // STORAGE LAYER
@@ -275,24 +275,24 @@ canvas{max-height:90px;}
 // For true cross-user sync: host this HTML on a server and
 // replace persist/load with a backend API call.
 // ============================================================
- 
+
 let store = { H: {}, P15: {} };
 let activeTab = 'H';
 let today = new Date();
 let viewYear = today.getFullYear();
 let viewMonth = today.getMonth();
 let selectedDate = formatDate(today);
- 
+
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
- 
+
 // ---- STATUS & TOAST ----
 function setStatus(msg, type) {
   var el = document.getElementById('syncStatus');
   el.textContent = msg;
   el.className = 'sync-status ' + type;
 }
- 
+
 function showToast(msg, color) {
   var t = document.getElementById('toast');
   t.textContent = msg;
@@ -300,7 +300,7 @@ function showToast(msg, color) {
   t.classList.add('show');
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
- 
+
 // ---- STORAGE: localStorage (reliable, works offline) ----
 function persist() {
   try {
@@ -313,7 +313,7 @@ function persist() {
     return false;
   }
 }
- 
+
 function loadFromStorage() {
   setStatus('loading...', 'loading');
   try {
@@ -328,26 +328,26 @@ function loadFromStorage() {
     return false;
   }
 }
- 
+
 function refreshFromStorage() {
   loadFromStorage();
   renderAll();
   showToast('\u2713 Refreshed from storage', '#059669');
 }
- 
+
 // ---- CORE HELPERS ----
 function formatDate(d) {
   return d.getFullYear() + '-' +
     String(d.getMonth()+1).padStart(2,'0') + '-' +
     String(d.getDate()).padStart(2,'0');
 }
- 
+
 function displayDate(s) {
   if (!s) return '\u2014';
   var p = s.split('-');
   return p[2] + '/' + p[1] + '/' + p[0];
 }
- 
+
 function calcUpTo(tab, date) {
   if (!date) return { cumCore:0, cumR:0, cumD:0, avgR:0, avgD:0, avgCore:0 };
   var s = store[tab];
@@ -362,7 +362,7 @@ function calcUpTo(tab, date) {
     avgCore: +(cc/n).toFixed(1)
   };
 }
- 
+
 function buildSeries(tab) {
   var s = store[tab];
   var keys = Object.keys(s).sort();
@@ -382,7 +382,7 @@ function buildSeries(tab) {
   });
   return { labels:labels, core:core, invR:invR, invDisp:invDisp, invCum:invCum, invAvg:invAvg, coreAvg:coreAvg };
 }
- 
+
 // ---- TAB & NAVIGATION ----
 function switchTab(t) {
   activeTab = t;
@@ -391,35 +391,35 @@ function switchTab(t) {
   document.getElementById('tab_P15').className = 'tab-btn' + (t==='P15' ? ' p-active' : '');
   renderAll();
 }
- 
+
 function changeMonth(d) {
   viewMonth += d;
   if (viewMonth > 11) { viewMonth=0; viewYear++; }
   if (viewMonth < 0)  { viewMonth=11; viewYear--; }
   renderAll();
 }
- 
+
 function goToday() {
   viewYear = today.getFullYear();
   viewMonth = today.getMonth();
   renderAll();
 }
- 
+
 // ---- SAVE ----
 function saveDay() {
   if (!selectedDate) { showToast('\u26a0 Select a date first!', '#f59e0b'); return; }
   var btn = document.getElementById('save_btn');
   btn.disabled = true;
   btn.textContent = '\u23f3 Saving...';
- 
+
   var core  = parseInt(document.getElementById('inp_core').value)  || 0;
   var inv_r = parseInt(document.getElementById('inp_inv_r').value) || 0;
   var inv_d = parseInt(document.getElementById('inp_inv_d').value) || 0;
- 
+
   var old = store[activeTab][selectedDate] || { core:null, inv_r:null, inv_d:null, log:[] };
   var ts = new Date().toISOString();
   var changes = [];
- 
+
   if (old.core === null) {
     changes.push('New entry: Core='+core+', Rec='+inv_r+', Disp='+inv_d);
   } else {
@@ -427,31 +427,31 @@ function saveDay() {
     if (old.inv_r !== inv_r) changes.push('Received: '+old.inv_r+' \u2192 '+inv_r);
     if (old.inv_d !== inv_d) changes.push('Dispatched: '+old.inv_d+' \u2192 '+inv_d);
   }
- 
+
   if (changes.length === 0) {
     showToast('\u2139 No changes detected', '#64748b');
     btn.disabled = false;
     btn.textContent = '\ud83d\udcbe Save (Global Shared)';
     return;
   }
- 
+
   var log = old.log ? old.log.slice() : [];
   log.unshift({ ts:ts, changes:changes });
- 
+
   store[activeTab][selectedDate] = { core:core, inv_r:inv_r, inv_d:inv_d, ts:ts, log:log };
- 
+
   var ok = persist();
   if (ok) {
     showToast('\u2713 Saved successfully!', '#059669');
   } else {
     showToast('\u26a0 Save failed — check storage', '#dc2626');
   }
- 
+
   btn.disabled = false;
   btn.textContent = '\ud83d\udcbe Save (Global Shared)';
   renderAll();
 }
- 
+
 // ---- RENDER: CALENDAR ----
 function renderCalendar() {
   var s = store[activeTab];
@@ -481,7 +481,7 @@ function renderCalendar() {
     grid.appendChild(el);
   }
 }
- 
+
 // ---- RENDER: DAY SUMMARY ----
 function renderDaySummary() {
   var dateKey = selectedDate || formatDate(today);
@@ -505,7 +505,7 @@ function renderDaySummary() {
     return '<div class="s-row"><div class="s-label"><div class="s-dot" style="background:'+r.color+'"></div>'+r.label+'</div><div class="s-val" style="color:'+r.color+'">'+r.val+'</div></div>';
   }).join('');
 }
- 
+
 // ---- RENDER: ENTRY FORM ----
 function renderEntryForm() {
   var ex = selectedDate ? store[activeTab][selectedDate] : null;
@@ -513,7 +513,7 @@ function renderEntryForm() {
   document.getElementById('inp_core').value  = ex ? ex.core  : '';
   document.getElementById('inp_inv_r').value = ex ? ex.inv_r : '';
   document.getElementById('inp_inv_d').value = ex ? ex.inv_d : '';
- 
+
   var mi = document.getElementById('modified_info');
   if (ex && ex.log && ex.log.length) {
     var html = '<div class="changelog"><div class="cl-title">\ud83d\udccb CHANGE LOG</div>';
@@ -529,7 +529,7 @@ function renderEntryForm() {
     mi.innerHTML = '<div class="changelog" style="color:#94a3b8;font-size:9px;">No previous logs</div>';
   }
 }
- 
+
 // ---- RENDER: LEGEND ----
 function renderLegend() {
   var date = selectedDate || formatDate(today);
@@ -548,7 +548,7 @@ function renderLegend() {
     return '<div class="legend-item"><div class="leg-dot" style="background:'+f.color+'"></div><span class="leg-label">'+f.label+'</span><span class="leg-val" style="color:'+f.color+'">'+f.val+'</span></div>';
   }).join('');
 }
- 
+
 // ---- RENDER: CHARTS ----
 var charts = {};
 function makeChart(id, labels, data, color, type) {
@@ -582,7 +582,7 @@ function makeChart(id, labels, data, color, type) {
     }
   });
 }
- 
+
 function renderTrends() {
   var s  = buildSeries(activeTab);
   var sH = buildSeries('H');
@@ -597,7 +597,7 @@ function renderTrends() {
   makeChart('p_avg_chart',     sP.labels, sP.invAvg,   '#eab308');
   makeChart('p_coreavg_chart', sP.labels, sP.coreAvg,  '#a855f7');
 }
- 
+
 // ---- RENDER: MONTHLY TABLE ----
 function renderMonthly() {
   var s = store[activeTab];
@@ -629,7 +629,7 @@ function renderMonthly() {
   }
   document.getElementById('monthly_table').innerHTML = html + '</tbody>';
 }
- 
+
 // ---- SHARE ----
 function buildMessage() {
   var date = selectedDate || formatDate(today);
@@ -658,19 +658,19 @@ function buildMessage() {
     '_ _ _ _ _ _ _ _ _ _ _ _\n' +
     'Warm Regards!!';
 }
- 
+
 function renderShare() {
   document.getElementById('share_preview').textContent = buildMessage();
 }
- 
+
 function shareWA() {
   window.open('https://wa.me/?text=' + encodeURIComponent(buildMessage()), '_blank');
 }
- 
+
 function shareEmail() {
   window.open('mailto:?subject=' + encodeURIComponent('Recon Report \u2014 ' + displayDate(selectedDate || formatDate(today))) + '&body=' + encodeURIComponent(buildMessage()), '_blank');
 }
- 
+
 // ---- MODAL: ALL DATA ----
 function openAllData() {
   var html = '';
@@ -699,15 +699,15 @@ function openAllData() {
   document.getElementById('modal_body').innerHTML = html;
   document.getElementById('modal_overlay').classList.add('show');
 }
- 
+
 function closeModal() {
   document.getElementById('modal_overlay').classList.remove('show');
 }
- 
+
 function closeModalOutside(e) {
   if (e.target === document.getElementById('modal_overlay')) closeModal();
 }
- 
+
 // ---- EXCEL EXPORT ----
 function exportExcel() {
   function buildSheetData(tab) {
@@ -732,6 +732,7 @@ function exportExcel() {
   XLSX.writeFile(wb, 'Recon_Engine_Report.xlsx');
 }
 
+// ---- MASTER RENDER ----
 function renderAll() {
   renderCalendar();
   renderDaySummary();
@@ -741,7 +742,7 @@ function renderAll() {
   renderMonthly();
   renderShare();
 }
- 
+
 // ---- INIT ----
 store = { H: {}, P15: {} };
 loadFromStorage();
