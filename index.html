@@ -254,19 +254,7 @@ persist();
 
 function formatDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function displayDate(s){if(!s)return '—';const p=s.split('-');return `${p[2]}/${p[1]}/${p[0]}`;}
-async function persist(){
-  await fetch(
-    "https://api.jsonbin.io/v3/b/6a2a833cda38895dfeac561e",
-    {
-      method:"PUT",
-      headers:{
-        "Content-Type":"application/json",
-        "X-Master-Key":"$2a$10$dqWgjRtBT1jT2jN1DvMbX.uX7dV/pb5D5fUqyUmZyoU.7Oah5XtEm"
-      },
-      body:JSON.stringify(store)
-    }
-  );
-}
+function persist(){localStorage.setItem('recon_v2_H',JSON.stringify(store.H));localStorage.setItem('recon_v2_P15',JSON.stringify(store.P15));}
 
 function switchTab(t){
   activeTab=t;selectedDate='';
@@ -508,29 +496,8 @@ function renderAll(){
   renderTrends();
   renderMonthly();
   renderShare();
-  async function loadData(){
-
-  const response = await fetch(
-    "https://api.jsonbin.io/v3/b/6a2a833cda38895dfeac561e/latest",
-    {
-      headers:{
-        "X-Master-Key":"UN_MASTER_KEY_INGA_PODU"
-      }
-    }
-  );
-
-  const data = await response.json();
-
-  if(data.record){
-    store.H = data.record.H || {};
-    store.P15 = data.record.P15 || {};
-  }
-
-  renderAll();
 }
-  loadData();
-setInterval(loadData,5000);
-  
+renderAll();
 </script>
 </body>
 </html>
