@@ -171,8 +171,6 @@ canvas{display:block;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loader-text{font-size:15px;font-weight:700;color:#64748b;}
  
-/* Off-screen chart container for Excel export */
-#offscreen_charts{position:fixed;left:-9999px;top:-9999px;width:600px;height:260px;background:#fff;}
 </style>
 </head>
 <body>
@@ -284,15 +282,7 @@ canvas{display:block;}
  </div>
 </div>
  
-<!-- Hidden off-screen canvases for building per-tab export charts -->
-<div id="offscreen_charts">
- <canvas id="ex_core_trend" width="580" height="240"></canvas>
- <canvas id="ex_inv_disp_trend" width="580" height="240"></canvas>
- <canvas id="ex_inv_rec_trend" width="580" height="240"></canvas>
- <canvas id="ex_cum" width="580" height="240"></canvas>
- <canvas id="ex_avg" width="580" height="240"></canvas>
- <canvas id="ex_coreavg" width="580" height="240"></canvas>
-</div>
+ 
  
 <script>
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -509,16 +499,20 @@ function closeModalOutside(e){if(e.target===document.getElementById('modal_overl
  
 // ─── Chart capture helpers ───────────────────────────────────────────────────
  
-const exportCharts = {};
- 
-function makeExportChart(id, labels, data, color, title, type='line') {
- if (exportCharts[id]) exportCharts[id].destroy();
- const canvas = document.getElementById(id);
- // White background
+// Render a chart onto a fresh offscreen canvas and return clean base64 PNG
+function renderChartToBase64(labels, data, color, title, type='line') {
+ return new Promise(resolve => {
+ // Create a temporary canvas (not in DOM, avoids Chart.js responsive issues)
+ const canvas = document.createElement('canvas');
+ canvas.width = 600;
+ canvas.height = 260;
  const ctx = canvas.getContext('2d');
+ 
+ // White background fill BEFORE Chart.js draws
  ctx.fillStyle = '#ffffff';
  ctx.fillRect(0, 0, canvas.width, canvas.height);
- exportCharts[id] = new Chart(canvas, {
+ 
+ const chart = new Chart(canvas, {
  type: type,
  data: {
  labels,
@@ -526,62 +520,60 @@ function makeExportChart(id, labels, data, color, title, type='line') {
  label: title,
  data,
  borderColor: color,
- backgroundColor: color + '33',
+ backgroundColor: color + '40',
  pointRadius: 4,
  pointBackgroundColor: color,
  tension: 0.4,
  fill: true,
  borderWidth: 2.5,
- borderRadius: type === 'bar' ? 4 : 0,
  }]
  },
  options: {
  responsive: false,
- animation: false,
+ animation: { duration: 0 },
  plugins: {
- legend: { display: true, labels: { color: '#1a1a2e', font: { size: 12, weight: '700' } } },
- title: { display: true, text: title, color: '#1a1a2e', font: { size: 14, weight: '700' } }
+ legend: { display: true, labels: { color: '#1a1a2e', font: { size: 13, weight: '700' }, padding: 10 } },
+ title: { display: true, text: title, color: '#1a1a2e', font: { size: 14, weight: '700' }, padding: { bottom: 8 } }
  },
  scales: {
- x: { ticks: { color: '#374151', font: { size: 11 } }, grid: { color: '#f1f5f9' } },
- y: { ticks: { color: '#374151', font: { size: 11 } }, grid: { color: '#f1f5f9' } }
+ x: { ticks: { color: '#374151', font: { size: 11 } }, grid: { color: '#e2e8f0' } },
+ y: { ticks: { color: '#374151', font: { size: 11 } }, grid: { color: '#e2e8f0' } }
  }
  }
  });
-}
  
-function canvasToBase64(id) {
- return new Promise(resolve => {
- // give chart time to render
- setTimeout(() => {
- const canvas = document.getElementById(id);
- resolve(canvas.toDataURL('image/png').split(',')[1]);
- }, 120);
+ // Wait for synchronous draw to complete
+ requestAnimationFrame(() => {
+ requestAnimationFrame(() => {
+ // Re-fill background in case Chart.js cleared it
+ ctx.save();
+ ctx.globalCompositeOperation = 'destination-over';
+ ctx.fillStyle = '#ffffff';
+ ctx.fillRect(0, 0, canvas.width, canvas.height);
+ ctx.restore();
+ 
+ const base64 = canvas.toDataURL('image/png').replace('data:image/png;base64,', '');
+ chart.destroy();
+ resolve(base64);
+ });
+ });
  });
 }
  
-// Build all 6 export charts for a given tab and return base64 images
+// Build all 6 chart images for a given tab
 async function buildExportChartsForTab(tab) {
  const s = buildSeries(tab);
- const color = tab === 'H' ? '#2563eb' : '#10b981';
  
- makeExportChart('ex_core_trend', s.labels, s.core, '#2563eb', 'Core Receipt Trend');
- makeExportChart('ex_inv_disp_trend', s.labels, s.invDisp, '#10b981', 'Invoice Dispatched Trend');
- makeExportChart('ex_inv_rec_trend', s.labels, s.invR, '#f97316', 'Invoice Received Trend');
- makeExportChart('ex_cum', s.labels, s.invCum, '#ef4444', 'Inv & Dispatch Cumulative');
- makeExportChart('ex_avg', s.labels, s.invAvg, '#eab308', 'Inv & Dispatch Average');
- makeExportChart('ex_coreavg', s.labels, s.coreAvg, '#a855f7', 'Core Average Receipt');
+ const [core_trend, inv_disp_trend, inv_rec_trend, cum, avg, coreavg] = await Promise.all([
+ renderChartToBase64(s.labels, s.core, '#2563eb', 'Core Receipt Trend'),
+ renderChartToBase64(s.labels, s.invDisp, '#10b981', 'Invoice Dispatched Trend'),
+ renderChartToBase64(s.labels, s.invR, '#f97316', 'Invoice Received Trend'),
+ renderChartToBase64(s.labels, s.invCum, '#ef4444', 'Inv & Dispatch Cumulative'),
+ renderChartToBase64(s.labels, s.invAvg, '#eab308', 'Inv & Dispatch Average'),
+ renderChartToBase64(s.labels, s.coreAvg, '#a855f7', 'Core Average Receipt'),
+ ]);
  
- await new Promise(r => setTimeout(r, 200));
- 
- return {
- core_trend: await canvasToBase64('ex_core_trend'),
- inv_disp_trend: await canvasToBase64('ex_inv_disp_trend'),
- inv_rec_trend: await canvasToBase64('ex_inv_rec_trend'),
- cum: await canvasToBase64('ex_cum'),
- avg: await canvasToBase64('ex_avg'),
- coreavg: await canvasToBase64('ex_coreavg'),
- };
+ return { core_trend, inv_disp_trend, inv_rec_trend, cum, avg, coreavg };
 }
  
 // ─── Excel export with ExcelJS ───────────────────────────────────────────────
@@ -677,40 +669,43 @@ async function exportExcelWithCharts() {
  labelRow.height = 26;
  
  // Chart layout: 2 per row, 3 rows
- // Each chart: ~580x240px → in Excel EMU: width ~8 cols * ~70px, height ~15 rows * 15px
  const chartDefs = [
- { key: 'core_trend', title: 'Core Receipt Trend' },
- { key: 'inv_disp_trend', title: 'Invoice Dispatched Trend' },
- { key: 'inv_rec_trend', title: 'Invoice Received Trend' },
- { key: 'cum', title: 'Inv & Dispatch Cumulative' },
- { key: 'avg', title: 'Inv & Dispatch Average' },
- { key: 'coreavg', title: 'Core Average Receipt' },
+ { key: 'core_trend' },
+ { key: 'inv_disp_trend' },
+ { key: 'inv_rec_trend' },
+ { key: 'cum' },
+ { key: 'avg' },
+ { key: 'coreavg' },
  ];
  
- // Row offset between charts (in rows)
- const chartRowHeight = 22; // ~22 rows per chart
- const chartColOffset = 4; // second chart starts at col 5
+ // Each chart occupies 15 rows x 4 cols in the sheet grid
+ const chartRows = 15;
+ const chartCols = 4;
+ 
+ // Pre-create enough rows so ExcelJS anchor cells exist
+ const totalChartRows = chartStartRow + 1 + 3 * chartRows + 2;
+ for (let ri = ws.rowCount + 1; ri <= totalChartRows; ri++) {
+ ws.getRow(ri).height = 15;
+ }
  
  for (let ci = 0; ci < chartDefs.length; ci++) {
- const { key } = chartDefs[ci];
- const base64 = images[key];
+ const base64 = images[chartDefs[ci].key];
  const imgId = wb.addImage({ base64, extension: 'png' });
  
  const rowIdx = Math.floor(ci / 2);
  const colIdx = ci % 2;
  
- const topRow = chartStartRow + 1 + rowIdx * chartRowHeight;
- const leftCol = colIdx === 0 ? 0 : chartColOffset;
+ const tlRow = chartStartRow + rowIdx * chartRows; // 0-based row
+ const tlCol = colIdx * chartCols; // 0-based col
+ const brRow = tlRow + chartRows;
+ const brCol = tlCol + chartCols;
  
  ws.addImage(imgId, {
- tl: { col: leftCol, row: topRow },
- ext: { width: 480, height: 220 }
+ tl: { col: tlCol, row: tlRow },
+ br: { col: brCol, row: brRow },
+ editAs: 'oneCell',
  });
  }
- 
- // Ensure enough rows exist for charts
- const totalRows = chartStartRow + 1 + 3 * chartRowHeight + 2;
- for (let r = ws.rowCount + 1; r <= totalRows; r++) ws.getRow(r).height = 15;
  }
  
  btn.textContent = '⏳ Writing file...';
